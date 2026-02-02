@@ -7,10 +7,10 @@ import rain_sensor
 import motor_control
 import led_control
 import rgb_led
-#import wind_sensor
-#from streaming import create_app
-#from stt import stt_button_listener 
-#from call import start_call_monitor
+import wind_sensor
+from streaming import create_app
+from stt import stt_button_listener 
+from call import start_call_monitor
 
 GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BCM)
@@ -20,11 +20,11 @@ initialize_app(cred, {
     'databaseURL': 'https://smart-bus-station-325771-default-rtdb.firebaseio.com/'
 })
 
-#app = create_app()
+app = create_app()
 
 def sensor_loop():
     ref_manual = db.reference('manual')
-    #ref_wind_sensor = db.reference('wind_sensor')
+    ref_wind_sensor = db.reference('wind_sensor')
     ref_rain_sensor = db.reference('rain_sensor')
 
     rgb_led.setup()
@@ -39,10 +39,10 @@ def sensor_loop():
             if rain_state is not None:
                 ref_rain_sensor.set(rain_state)
 
-            #wind_speed = wind_sensor.read_wind()
-            #if wind_speed is not None:
-                #print(f"Uploading wind speed to Firebase: {wind_speed} m/s")
-                #ref_wind_sensor.set(wind_speed)
+            wind_speed = wind_sensor.read_wind()
+            if wind_speed is not None:
+                print(f"Uploading wind speed to Firebase: {wind_speed} m/s")
+                ref_wind_sensor.set(wind_speed)
 
             is_manual = ref_manual.get()
 
@@ -87,7 +87,7 @@ def sensor_loop():
 
 if __name__ == "__main__":
     threading.Thread(target=sensor_loop, daemon=True).start()
-    #threading.Thread(target=stt_button_listener, daemon=True).start()
-    #threading.Thread(target=start_call_monitor, daemon=True).start()
+    threading.Thread(target=stt_button_listener, daemon=True).start()
+    threading.Thread(target=start_call_monitor, daemon=True).start()
 
-   #app.run(host='0.0.0.0', port=8080)
+   app.run(host='0.0.0.0', port=8080)
